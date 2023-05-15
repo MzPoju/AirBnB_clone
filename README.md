@@ -2,6 +2,7 @@ AirBnB Clone
 
 
 Description of the project
+
 The goal of the project is to deploy a replica of the Airbnb Website using my server. The final version of this project will have:
 
 A command interpreter to manipulate data without a visual interface, like a shell (for development and debugging).
