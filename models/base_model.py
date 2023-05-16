@@ -5,63 +5,46 @@ from uuid import uuid4
 from datetime import datetime
 import models
 
+
 class BaseModel:
-    """Base for classes in console project
-
-    Method:
-        __str__: prints the class name, id, and creates dictionary representations of the input values
-        save(self): arttribute with current datetime are saved
-        to_dict(self): return values of instance obj
-
-    """
+    """Represents the BaseModel of the HBnB project."""
 
     def __init__(self, *args, **kwargs):
-        """Public initialization of attributes  after creation
-
+        """Initialize a new BaseModel.
         Args:
-            *args(args): arguments
-            **kwargs(dict): attrubutes
-
+            *args (any): Unused.
+            **kwargs (dict): Key/value pairs of attributes.
         """
-        DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
-        if not kwargs:
-            self.id = str(uuid4())
-            self.created_at = datetime.utcnow()
-            self.updated_at = datetime.utcnow()
-            models.storage.new(self)
-        else:
-            for key, value in kwargs.items():
-                if key in ("updated_at", "created_at"):
-                    self.__dict__[key] = datetime.strptime(
-                        value, DATE_TIME_FORMAT)
-                elif key[0] == "id":
-                    self.__dict__[key] = str(value)
+        tform = "%Y-%m-%dT%H:%M:%S.%f"
+        self.id = str(uuid4())
+        self.created_at = datetime.today()
+        self.updated_at = datetime.today()
+        if len(kwargs) != 0:
+            for k, v in kwargs.items():
+                if k == "created_at" or k == "updated_at":
+                    self.__dict__[k] = datetime.strptime(v, tform)
                 else:
-                    self.__dict__[key] = value
-
-    def __str__(self):
-        """
-        String of class
-        """
-        return "[{}] ({}) {}".format(self.__class__.__name__,
-                                     self.id, self.__dict__)
+                    self.__dict__[k] = v
+        else:
+            models.storage.new(self)
 
     def save(self):
-        """
-        Updates the attribute with the current datetime
-        """
-        self.updated_at = datetime.utcnow()
+        """Update updated_at with the current datetime."""
+        self.updated_at = datetime.today()
         models.storage.save()
 
     def to_dict(self):
+        """Return the dictionary of the BaseModel instance.
+        Includes the key/value pair __class__ representing
+        the class name of the object.
         """
-        Returns values of __dict__ instance
-        """
-        map_objects = {}
-        for key, value in self.__dict__.items():
-            if key == "created_at" or key == "updated_at":
-                map_objects[key] = value.isoformat()
-            else:
-                map_objects[key] = value
-        map_objects["__class__"] = self.__class__.__name__
-        return map_objects
+        rdict = self.__dict__.copy()
+        rdict["created_at"] = self.created_at.isoformat()
+        rdict["updated_at"] = self.updated_at.isoformat()
+        rdict["__class__"] = self.__class__.__name__
+        return rdict
+
+    def __str__(self):
+        """Return the print/str representation of the BaseModel instance."""
+        clname = self.__class__.__name__
+        return "[{}] ({}) {}".format(clname, self.id, self.__dict__)
